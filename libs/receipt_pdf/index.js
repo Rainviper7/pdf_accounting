@@ -27,35 +27,18 @@ module.exports = function (options, callback) {
     var filename = options.filePath;
 
     var data = options.data,
-        dateStamp = moment(data.date).format("DD/MM/YYYY")
+        dateStamp = moment(data.date).format("DD/MM/YYYY"),
+        lastIndexPage = data.length - 1
         ;
 
     //-------หน้ารายงาน
-    // var docDefinition = drawDocDefinition();
-    var companies = []
-    _.forEach(data, function (customer, index) {
-        companies.push(drawDocDefinition(customer))
-    });
-
-
-    var res = []
-    _.forEach(companies, function (contentArray, index) {
-
-
-        _.forEach(contentArray, function (data2, index2) {
-            res.push(data2)
-        });
-
-    });
-
     var docDefinition = {
-        content: companies,
+        content: sortData(data),
         pageSize: 'A4',
         pageOrientation: 'portrait',
         // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
         pageMargins: [50, 50, 50, 50]
     }
-    // var docDefinition = drawDoc2();
 
     //----------main
     buildReport(docDefinition);
@@ -73,7 +56,7 @@ module.exports = function (options, callback) {
         }, 1500);
     }
 
-    function drawDocDefinition(company) {
+    function drawDocDefinition(company, index) {
         return [
 
             {
@@ -134,12 +117,25 @@ module.exports = function (options, callback) {
                 },
                 layout: 'noBorders'
             },
-            {
-                text: '',
-                pageOrientation: 'portrait',
-                pageBreak: 'before'
-            }
+            addNewPage(lastIndexPage, index)
         ]
+    }
+
+    function sortData(rawdata) {
+        var companies = []
+        _.forEach(rawdata, function (customer, index) {
+            companies.push(drawDocDefinition(customer, index))
+        });
+
+        var res = []
+        _.forEach(companies, function (contentArray, index) {
+            _.forEach(contentArray, function (data2, index2) {
+                res.push(data2)
+            });
+
+        });
+
+        return res;
     }
 
     function drawHeader() {
@@ -172,7 +168,6 @@ module.exports = function (options, callback) {
                 }
             ]
         ]
-
     }
 
     function drawFooter() {
@@ -311,6 +306,18 @@ module.exports = function (options, callback) {
         ]
     }
 
+    function addNewPage(lastpage, index) {
+        if (index < lastpage) {
+            return {
+                text: ' ',
+                pageOrientation: 'portrait',
+                pageBreak: 'after'
+            }
+        } else {
+            return blankCell()
+        }
+    }
+
     function NewLine(count) {
         for (i = 0; i < count; i++) {
             return '\n'
@@ -324,6 +331,7 @@ module.exports = function (options, callback) {
             style: C.FONT_STYLES.NORMAL
         }
     }
+
     function numberWithComma(n) {
         return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
     }

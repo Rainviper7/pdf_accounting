@@ -1,9 +1,8 @@
 const _ = require('lodash'),
     moment = require('moment'),
     monReport = require('./index'),   // require('mon-niceloop-report')
-
-    //receiptreport = require('./libs/receipt_pdf'),
     _data = require('./libs/receipt_pdf/mock_data').data
+    ;
 
 var time = new Date,
     datetime2 = moment(time).format("DDMM_HHmmss"),
@@ -15,7 +14,6 @@ var params_default = {
     data: _data
 }
 
-
 function build() {
 
     new monReport.receiptReport(params_default, function (filePath) {
@@ -25,6 +23,4 @@ function build() {
 
 }
 
-
 build()
-
