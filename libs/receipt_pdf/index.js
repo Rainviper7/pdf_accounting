@@ -163,7 +163,7 @@ module.exports = function (options, callback) {
             [
                 blankCell(),
                 {
-                    text: 'เลขประจำตัวผู้เสียภาษีอากร : ' + '0-1355-57000-06-1',
+                    text: 'โทร 02-0385600,        เลขประจำตัวผู้เสียภาษีอากร : ' + '0-1355-57000-06-1',
                     style: C.FONT_STYLES.NORMAL
                 }
             ]
