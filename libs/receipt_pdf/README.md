@@ -6,7 +6,7 @@
 | ----|----|----------- 
 receiptId | string | idใบเสร็จ
 refId | string | หมายเลขอ้างอิง
-customer | [{customer}](#customer) ข้อมูลลูกค้า
+customer | [{customer}](#customer) | ข้อมูลลูกค้า
 list | [{list}](#list) | รายการสินค้า
 subTotal | number | ราคารวมของสินค้า
 discount | number | ส่วนลดท้ายบิล
