@@ -18,10 +18,10 @@ var FONT_STYLES = {
 }
 
 var TABLE_STYLES = {
-    TABLE_EXAMPLE: {
+    MARGIN_DEFAULT: {
         margin: [0, 5, 0, 15]
     },
-    LAYOUT: {
+    LAYOUT_LINE: {
         THIN_GRAY: {
             hLineWidth: function (i, node) {
                 return 0.5

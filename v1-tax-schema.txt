@@ -1,0 +1,20 @@
+#receipts-full-vat
+
+| receipts                  | default |                             |
+| ------------------------- | ------- | --------------------------- |
+| customerId                | string  |                             |
+| datetime-table-grandtotal | string  | orderId is Real Id in table |
+| refId                     | string  | orderId in POS system       |
+| customer                  | {obj}   |                             |
+|   customer.name             | string  |                             |
+|   customer.id               | string  | TaxId / ขัตรประชาชน         |
+|   customer.branch           | string  |                             |
+|   customer.address          | string  |                             |
+| grandTotal                | float   |                             |
+| beforeVat                 | float   |
+| vat                       | float   |                             |
+| vatText                   | string  | ex: 7% inc.                 |
+| isDeleted                 | bool    |                             |
+| createAt                  | string  |                             |
+| businessDate              | string  |                             |
+| items                     | []      |                             |

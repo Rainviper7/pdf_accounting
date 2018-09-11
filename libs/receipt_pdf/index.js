@@ -15,7 +15,9 @@ var fonts = {
     },
     Customs: {
         normal: './libs/receipt_pdf/fonts/Roboto-Regular.ttf',
-        bold: './libs/receipt_pdf/fonts/Roboto-Medium.ttf'
+        bold: './libs/receipt_pdf/fonts/Roboto-Medium.ttf',
+        italics: './libs/receipt_pdf/fonts/Roboto-Italic.ttf',
+        bolditalics: './libs/receipt_pdf/fonts/Roboto-MediumItalic.ttf'
     }
 };
 
@@ -26,14 +28,14 @@ module.exports = function (options, callback) {
 
     var filename = options.filePath;
 
-    var data = options.data,
-        dateStamp = moment(data.date).format("DD/MM/YYYY"),
-        lastIndexPage = data.length - 1
+    var _data = options.data,
+        dateStamp = moment(_data.date).format("DD/MM/YYYY"),
+        lastIndexPage = _data.length - 1
         ;
 
     //-------หน้ารายงาน
     var docDefinition = {
-        content: sortData(data),
+        content: sortData(_data),
         pageSize: 'A4',
         pageOrientation: 'portrait',
         // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
@@ -44,8 +46,6 @@ module.exports = function (options, callback) {
     buildReport(docDefinition);
 
     function buildReport(dd) {
-
-        //-------------------------operate
         var pdfDoc = printer.createPdfKitDocument(dd);
         pdfDoc.pipe(fs.createWriteStream(filename));
         console.log("--receipt completed")
@@ -59,27 +59,33 @@ module.exports = function (options, callback) {
     function drawDocDefinition(company, index) {
         return [
 
+            //--header receipt
             {
-                style: C.FONT_STYLES.tableExample,
+                style: C.TABLE_STYLES.MARGIN_DEFAULT,
                 table: {
                     widths: [150, 350],
                     body: drawHeader(),
                 },
                 layout: 'noBorders'
             },
-            blankCell(), blankCell(), blankCell(),
-            blankCell(), blankCell(),
+
+            blankCell(), blankCell(), blankCell(), blankCell(), blankCell(),
+
             {
                 text: 'ใบเสร็จรับเงิน / ใบกำกับภาษี',
                 style: C.FONT_STYLES.HEADER,
                 alignment: 'center'
             },
+
             NewLine(2),
+
             {
                 text: 'Customer',
                 bold: true
-            }, {
-                style: C.TABLE_STYLES.TABLE_EXAMPLE,
+            },
+
+            {
+                style: C.TABLE_STYLES.MARGIN_DEFAULT,
                 table: {
                     widths: [375, 100],
                     body: drawCustomerInfo(company)
@@ -87,52 +93,56 @@ module.exports = function (options, callback) {
                 layout: 'noBorders'
 
             },
-            NewLine(2)
-            ,
+
+            NewLine(2),
+
             //------------------itemList
             {
-                style: [C.TABLE_STYLES.TABLE_EXAMPLE, C.FONT_STYLES.NORMAL],
+                style: [C.TABLE_STYLES.MARGIN_DEFAULT, C.FONT_STYLES.NORMAL],
                 table: {
                     heights: 15,
                     widths: [150, 50, 100, 50, 100],
                     body: drawDetail(company.list)
                 },
-                layout: C.TABLE_STYLES.LAYOUT.THIN_GRAY
+                layout: C.TABLE_STYLES.LAYOUT_LINE.THIN_GRAY
             },
+
             NewLine(2),
             {
-                style: [C.TABLE_STYLES.TABLE_EXAMPLE, C.FONT_STYLES.NORMAL],
+                style: [C.TABLE_STYLES.MARGIN_DEFAULT, C.FONT_STYLES.NORMAL],
                 table: {
                     widths: [295, 70, 100],
                     body: drawSummaryChart(company)
                 },
-                layout: C.TABLE_STYLES.LAYOUT.THIN_GRAY
+                layout: C.TABLE_STYLES.LAYOUT_LINE.THIN_GRAY
             },
+
             blankCell(), blankCell(), blankCell(),
+
+            //--footer signature
             {
-                style: [C.TABLE_STYLES.TABLE_EXAMPLE, C.FONT_STYLES.NORMAL],
+                style: [C.TABLE_STYLES.MARGIN_DEFAULT, C.FONT_STYLES.NORMAL],
                 table: {
                     widths: [90, 150, 10, 110, 80],
                     body: drawFooter()
                 },
                 layout: 'noBorders'
             },
+
             addNewPage(lastIndexPage, index)
         ]
     }
 
     function sortData(rawdata) {
-        var companies = []
-        _.forEach(rawdata, function (customer, index) {
-            companies.push(drawDocDefinition(customer, index))
-        });
+        var companies = [],
+            res = []
+            ;
 
-        var res = []
-        _.forEach(companies, function (contentArray, index) {
-            _.forEach(contentArray, function (data2, index2) {
-                res.push(data2)
-            });
+        _.forEach(rawdata, (customer, index) => companies.push(drawDocDefinition(customer, index)));
 
+        _.forEach(companies, function (company) {
+
+            _.forEach(company, (data2) => res.push(data2));
         });
 
         return res;
@@ -163,7 +173,7 @@ module.exports = function (options, callback) {
             [
                 blankCell(),
                 {
-                    text: 'โทร 02-0385600,        เลขประจำตัวผู้เสียภาษีอากร : ' + '0-1355-57000-06-1',
+                    text: `โทร 02-0385600${'\n'}เลขประจำตัวผู้เสียภาษีอากร : ${'0-1355-57000-06-1'}`,
                     style: C.FONT_STYLES.NORMAL
                 }
             ]
@@ -188,9 +198,8 @@ module.exports = function (options, callback) {
                 blankCell()
             ],
             [
-                blankCell(),
-                blankCell(),
-                blankCell(),
+                blankCell(), blankCell(), blankCell(),
+
                 {
                     alignment: 'center',
                     image: './libs/receipt_pdf/img/DisplayUserSignatureImage.png',
@@ -227,11 +236,11 @@ module.exports = function (options, callback) {
         return [
             [
                 {
-                    text: info.customer.name + ' ' + info.customer.branchName,
+                    text: `${info.customer.name} ${info.customer.branchName}`,
                     style: C.FONT_STYLES.NORMAL
                 },
                 {
-                    text: 'วันที่ : ' + dateStamp,
+                    text: `วันที่ : ${dateStamp}`,
                     style: C.FONT_STYLES.NORMAL
                 }
             ],
@@ -241,13 +250,13 @@ module.exports = function (options, callback) {
                     style: C.FONT_STYLES.NORMAL
                 },
                 {
-                    text: 'เลขที่ : ' + info.receiptId,
+                    text: `เลขที่ : ${info.receiptId}`,
                     style: C.FONT_STYLES.NORMAL
                 }
             ],
             [
                 {
-                    text: 'เลขที่ผู้เสียภาษี : ' + info.customer.taxId,
+                    text: `เลขที่ผู้เสียภาษี : ${info.customer.taxId}`,
                     style: C.FONT_STYLES.NORMAL
                 },
                 blankCell()
@@ -256,7 +265,7 @@ module.exports = function (options, callback) {
     }
 
     function drawDetail(list) {
-
+        //-- push
         var data = []
         _.forEach(list, (line) => {
             data.push([
@@ -277,6 +286,7 @@ module.exports = function (options, callback) {
             ])
         })
 
+        //---draw list to table 
         let tableList = [
             [
                 { text: 'Item', bold: true },
@@ -332,7 +342,7 @@ module.exports = function (options, callback) {
         }
     }
 
-    function numberWithComma(n) {
-        return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+    function numberWithComma(number) {
+        return number.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
     }
 }

@@ -1,6 +1,6 @@
 const _ = require('lodash'),
     moment = require('moment'),
-    monReport = require('./index'),   // require('mon-niceloop-report')
+    AccountingReport = require('./index'),   // require('mon-niceloop-report')
     _data = require('./libs/receipt_pdf/mock_data').data
     ;
 
@@ -16,7 +16,7 @@ var params_default = {
 
 function build() {
 
-    new monReport.receiptReport(params_default, function (filePath) {
+    new AccountingReport.receiptReport(params_default, function (filePath) {
         console.log("Gen file pdf complete : " + filePath)
     })
 
